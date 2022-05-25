@@ -1,0 +1,102 @@
+la libreria body-parser nos permite que con todas las peticiones tipo REST http poder parsear el cuerpo de la peticion y esos datos que enviemos poderlos tratar y recoger en node y ya enviarlos a una base de datos por ejemplo.
+
+podemos resumir las instrucciones de instalacion por consola en una sola letra como por ejemplo, install puede ser "i", devDependencies puede ser "-D" --save puede ser "-S"
+
+Que se hizo en este video? Pues bueno, se habla de los diferentes tipos de peticiones que hay, hay un chingo por lo que veo, pero, las necesarias para que una api sea RESTful son 
+
+GET - para pedir datos al servidor
+POST - para mandar datos al servidor y probablemente guardarlos de manera no volatil
+PUT - para mandar datos al servidor y actualizarlos
+DELETE - para pedirle al servidor que borre ciertos datos 
+
+Estos metodos excepto GET Y DELETE tienen cabecera y cuerpo de peticion, podemos encontrar en la cabecera metadatos que se envian en las peticiones,  es decir, datos acerca de la peticion como tal
+
+
+Se habló tambien de codigos de respuesta como los:
+1xx - Respuestas informativas 
+2xx - Respuesta correctas 
+3xx - Respuestas de redireccion
+4xx - Problemas de parte del cliente, tal vez escribió la ruta mal
+5xx - Problemas con el servidor a nivel interno, tal vez no se pudo realizar la conexion
+
+
+Que se hizo en el video #8?
+
+Instalamos mongodb para nuestra base de datos, instalamos una dependencia llamada "mongoose" para hacer uso de nuestra base de datos mongo a partir de nodejs
+
+utilizamos su metodo "connect" para conectarnos a mongo, y luego pasamos nuestra funcion de conexion al servidor dentro de la funcion de conexion a mongo
+
+Que se hizo en el video #9?
+
+Hemos empezado a hacer que nuestra funcion sea modular, pasamos la creacion de nuestro esquema producto a otro archivo js el cual exportamos con module.exports para luego poder utilizarlo con un require dentro del index, hacemos la creacion del esquema con nuestra dependencia mongoose y su propiedad Schema, dicho esquema es exportado con la propiedad model de mongoose que reciba como primer argumento el nombre del esquema y como segundo argumento la definicion de nuestro esquema
+
+Luego, creamos nuestra funcion de post ya con las funciones de mongo, en donde creamo una nueva instancia de nuestro modulo product, lo rellenamos con los datos del request y guardamos con la propiedad save de product ya que es un objeto de mongoose
+
+dentro de la funcion mostramos por consola que es una peticion POST y su ruta ademas del cuerpo del request 
+
+
+
+Que se hizo en el video #10?
+
+Hicimos que funcionace la funcion show e index con la base de datos mongo, como? pues para la funcion show, utilizamos la funcion findById de nuestra variable Product que es un objeto de mongoose el cual contiene el esquema Product, la cual recibe como primer parametro el id que nos da mongo, este lo obtenemos del parametro id que definimos en la ruta con req.params.nombreDeParametro, luego recibe como segundo parametro un callback con un error y el producto que encontramos, tratamos el error que se haya encontrado con referencia al servidor y tratamos el error de que no se haya encontrado producto, sino pasa nada de eso, pues mandamos el producto encontrado en un objeto json
+
+Hicimos tambien la funcion para ver todos los productos (index) en la cual buscamos todos los productos mediante nuestra variable Product y su funcion find la cual recibe como primer parametro un objeto vacio (lo cual le da a entender que busque todos los que encuentre la base de datos) y recibe como segundo parametro un callback que recibe como primer parametro un error y como segundo parametro los productos
+
+
+Que se hizo en este video #11?
+
+Hicimos la funcion de actualizar y de eliminar, put y delete, para la funcion delete nos traemos el id de los parametros establecidos en la ruta, en este caso solo hemos establecido el id del producto, luego buscamos nuestro producto con la funcion findById de nuestra variable Product que es objeto de mongoose, la cual, recibe el id como primer parametro y como segundo parametro recibe un callback, con su error y el producto, dentro del callback tratamos el error y si no hay utilizamos la propiedad delete del segundo parametro del callback el cual eliminaria el elemento
+
+Con respecto a la funcion de actualizar, sacamos el id de los parametros y sacamos los elementos por los cuales actualizaremos (es decir la informacion que nos haya mandado el usuario) recordemos que esta informacion se encuentra denntro del body del request, luego, utilizamos una nueva propiedad de nuestra constante Product que es objeto de mongoose, la cual es, findByIdAndUpdate, propiedad que recibe como primer parametro el id que hemos sacado de los parametros,  recibe como segundo parametro los datos que extraimos en principio desde el body y por ultimo recibe un callback que recibe como parametro, error y el producto que hemos actualizado
+
+
+
+Que se hizo en este video #12?
+
+Modularizamos todo lo que habiamos hecho, pasamos los controladores (aquellos que se conectan con la base de datos mongo) a su propio archivo en su carpeta, dividimos configuracion de servidor y conexion a base de datos, llevamos las rutas a su propia carpeta y archivo, donde usamos un metodo nuevo de express llamado Router() y lo guardamos en una constante llamada "api" esto es para simplificar el usu de las rutas, este archivo lo exportamos con module.exports y lo recivimos en el apartado de configuracion de servidor, donde tambien usamos a express para hacer uso del metodo use que recive como primer parametro '/api' que se le antepone a la url de las rutas y tiene como segundo parametro el archivo api que requerimos
+
+Por ultimo movimos nuestras rutas de conexion a otro archivo en la raiz del proyecto llamado config.js donde tenemos el puerto para el servidor express y el puerto para la base de datos
+
+
+
+Que se hizo en este video #13?
+
+Usamos nuevas dependencias, una para la encriptacion de la contraseña "bcrypt" y "crypto" para la creacion del hash utilzada para tratar el uso de avatares a partir de la pagina web "gravatar.com"
+
+Creamos el modulo/esquema de usuario para la realizacion del logueo en la aplicacion, colocamos sus respectivos atributos
+
+
+
+Que se hizo en este video #14?
+
+Se explicó acerca de los Jason Web Tokens (JWT), el señor hablaba de que si estuviesemos haciendo la api de tal manera que estuviesemos renderizando las plantillas dentro de la misma (Como suelo hacer con laravel, creo yo) cosa que backend y frontend no estuviesen separados cada uno por su parte, pues seria un poco mas sencillo el poder tratar las autenticaciones de los usuario, sin embargo, habla de que si queremos que nuestra apirest sea escalable, es decir que sirva para cualquier frontend incluso para una aplicacion movil, lo que mejor se adapta es justo una autenticacion por tokens, en donde, el usuario enviará un codigo al servidor, luego el servidor lo recibe y se encarga de descifrar que usuario es
+
+
+
+Que se hizo en este video #15?
+
+hacemos uso de la libreria jws-simple para nuestro jason web token, creamos un controlador para usuario en donde manejamos dos funciones (signUp y signIn) una para registro y otra para reingreso (creo).
+Dichas funciones del controlador, como trabajarán con peticiones HTTP y ademas estamos haciendo uso de express pues reciben como parametro un request y un response.
+trabajamos sobre la funcion de registro signUp, en donde creamos una constante usuario que es instancia de nuestro modelo User, en donde llenamos solo los datos de displayName y email, ya que los demas campos como la contraseña se genera con anterioridad para aquello de hacerle el hash a la contraseña con la libreria "bcrypt" o por ejemplo en la fecha de creacion ya tiene la fecha actual del sistema en el momento como valor por defecto, luego, dentro de la misma funcion guardamos el usuario con la propiedad save de nuestra constante user que es instancia de nuestro modelo User, la cual recibe como parametro un callback con un error, dentro de este callback tratamos el error si es que hay y sino, retornamos un estado 200 y mandamos un token, para la creacion de este token vamos a crear un carpeta "services" donde crearemos nuestro servicio para la creacion del token, en el cual creamos nuestro payload que tendrá el id, fecha de creacion de token y fecha de expiracion, usamos para el id, el id que nos genera mongo para cada registro, lo cual no es seguro, pero para fines practicos del curso asi se hizo, luego hacemos uso de la dependencia moment para manejar fechas de manera sencilla, luego, codificamos el token con la propiedad encode de nuestro objeto pertenciente a la dependencia jws-simple, lo cual recibe como primer parametro el payload y como segundo parametro una contraseña que se guardará dentro del archivo config y esto ultimo lo retornamos 
+
+
+Que se hizo en este video #16?
+
+Creamos nuestro middleware, creamos una carpeta y un archivo auth, creamos una funcion isAuth que recibe como parametro, request, response y ademas, como es middleware tendrá un parametro "next" que hará que no se quede la ejecucion dentro del middleware y continue.
+Primero verificamos que existe autorizacion con la propiedad authorization perteneciente al header del request, luego sacamos el token de la propiedad authorization perteneciente al header del request, lo partimos con split y tomamos el segundo valor que es el valor del token, luego decodificamos el token con jwt.decode, verificamos que el token no haya expirado, en caso que no haya caducado, autoriza e indica que el usuario del request es el usuario del payload.sub y pasamos a lo siguiente con next() que es seguir al siguiente parametro del controlador desde el cual se llamó
+
+
+Que se hizo en este video #17?
+
+- Hacemos la funcion signIn para cuando el usuario quiera ingresar
+- Refactorizamos el middleware auth, la parte del decode la mandamos al servicio
+- Uso de promesas en servicio
+
+La funcion signIn recibirá como parametro request y response, utilizaremos dicha funcion para permitir acceso a usuarios ya registrados, entonces, lo primero es buscar el usuario dentro de la base de datos por medio de nuestra variable User que es donde guardamos el modelo, la funcion "find" de User recibirá como primer parametro el email del usuario que podemos encontrarlo en el body del request y recibirá como segundo parametro un callback con err y user, dentro de dicho callback trataremos el error y en caso de que el usuario no exista, si nada de eso sucede, le asignamos user a nuestro user de request y mandamos como respuesta/response el estado, un mensaje y la creacion del token
+
+Para la parte de la refactorizacion y como el señor queria utilizar cosas del ES6, pues utilizamos una promesa. Hacemos una "decodeToken" funcion dentro de nuestro archivo servicio y le mandamos como parametro el token, dentro de la funcion es donde utilizamos la promesa, la cual es una constante a la cual se le asigna una instancia de Promise la cual recibe como parametro una funcion flecha con resolve y reject, dentro de esta funcion tratamos el contenido con un try - catch, dentro del try vamos a decodificar nuestro payload, verificamos que el token no haya expirado y si todo está bien devolvemos con un resolve el payload.sub el cual dentro de nuestro middleware auth será asignado a req.user y hacemos que pase al siguiente parametro con next, esto dentro de .then que se debe colocar al llamar a promesas para tratar los resolve y se debe colocar un catch para tratar los reject. Volviendo atras, dentro de la funcion promesa, en el catch mandamos un objeto dentro del reject con status y un mensaje de que el token es invalido. Al finalizar nuestra funcion decodeToken retornaremos nuestra constante "decoded" a la cual le habiamos asignado nuestra promesa (retornamos nuestra promesa, vaya)
+
+
+
+
+Que se hizo en este video #18?
